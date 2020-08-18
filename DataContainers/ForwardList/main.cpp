@@ -40,9 +40,10 @@ public:
 	}
 	~ForwardList()
 	{
-		while (Head!=nullptr)pop_front();
 		cout << "LDestructor:\t" << this << endl;
 	}
+
+	
 	//			Добавление элементов
 	void push_front(int Data)
 	{
@@ -88,7 +89,8 @@ public:
 		Temp->pNext = New;
 		size++;
 	}
-	//			Удаление элементов:
+
+	//			Удавление элементов:
 	void pop_front()
 	{
 		Element* to_del = Head;	//1) запоминаем адрес удаляемого элемента
@@ -96,6 +98,7 @@ public:
 		delete to_del;	//3) удаляем элемент из памяти
 		size--;
 	}
+
 	void pop_back()
 	{
 		Element* Temp = Head;
@@ -107,6 +110,7 @@ public:
 		Temp->pNext = nullptr;
 		size--;
 	}
+	
 	//			Methods:
 	void print()
 	{
@@ -142,10 +146,10 @@ void main()
 	{
 		list.push_front(rand() % 100);
 	}
-	//list.push_back(123);
+	list.push_back(123);
 	list.print();
 	cout << delimiter;
-	/*list.pop_front();
+	list.pop_front();
 	list.pop_back();
 	list.print();
 	int index;
@@ -153,7 +157,7 @@ void main()
 	cout << "Input index: "; cin >> index;
 	cout << "Input value: "; cin >> value;
 	list.insert(index, value);
-	list.print();*/
+	list.print();
 #endif // BASE_CHECK
 
 	/*ForwardList list1;
