@@ -38,12 +38,30 @@ public:
 		size = 0;
 		cout << "LConstructor:\t" << this << endl;
 	}
+	ForwardList(const ForwardList& other)
+	{
+		this->Head = nullptr;
+		this->size = 0;
+		for (Element* Temp = Head; Temp; Temp = Temp->pNext)push_back(Temp->Data);
+		cout << "LCopyConstructor:\t" << this << endl;
+	}
+	ForwardList(int size):ForwardList()
+	{
+		while (size--)push_front(0);
+	}
 	~ForwardList()
 	{
+		while (Head != nullptr)pop_front();
 		cout << "LDestructor:\t" << this << endl;
 	}
 
-	
+	//Operators
+	int& operator[](int index)
+	{
+		Element* Temp = Head;
+		for (int i = 0; i < index; i++)Temp = Temp->pNext;
+		return Temp->Data;
+	}
 	//			Добавление элементов
 	void push_front(int Data)
 	{
@@ -89,7 +107,6 @@ public:
 		Temp->pNext = New;
 		size++;
 	}
-
 	//			Удавление элементов:
 	void pop_front()
 	{
@@ -98,7 +115,6 @@ public:
 		delete to_del;	//3) удаляем элемент из памяти
 		size--;
 	}
-
 	void pop_back()
 	{
 		Element* Temp = Head;
@@ -110,7 +126,6 @@ public:
 		Temp->pNext = nullptr;
 		size--;
 	}
-	
 	//			Methods:
 	void print()
 	{
@@ -134,13 +149,13 @@ public:
 
 #define delimiter "\n----------------------------------\n"
 
-#define BASE_CHECK
+//#define BASE_CHECK
 
 void main()
 {
-#ifdef BASE_CHECK
 	int n;
 	cout << "Input list size: "; cin >> n;
+#ifdef BASE_CHECK
 	ForwardList list;
 	for (int i = 0; i < n; i++)
 	{
@@ -149,7 +164,9 @@ void main()
 	list.push_back(123);
 	list.print();
 	cout << delimiter;
-	list.pop_front();
+
+
+	/*list.pop_front();
 	list.pop_back();
 	list.print();
 	int index;
@@ -157,7 +174,7 @@ void main()
 	cout << "Input index: "; cin >> index;
 	cout << "Input value: "; cin >> value;
 	list.insert(index, value);
-	list.print();
+	list.print();*/
 #endif // BASE_CHECK
 
 	/*ForwardList list1;
@@ -175,4 +192,16 @@ void main()
 	list2.print();
 	cout << delimiter;
 	list1.print();*/
+
+	ForwardList list(n);
+
+	for (int i = 0; i < n; i++)
+	{
+		list[i] = rand() % 100;
+	}
+	for (int i = 0; i < n*2; i++)
+	{
+		cout << list[i] << '\t';
+	}
+	cout << endl;
 }
