@@ -2,7 +2,6 @@
 using namespace std;
 
 #define tab "\t"
-
 //1) Element - описывает структуру элемента
 //2) ForwardList - отвечает за объединение элементов в список, добавление/удавление элементов, и т.д.
 
@@ -15,23 +14,96 @@ public:
 	Element(int Data, Element* pNext = nullptr) :Data(Data), pNext(pNext)
 	{
 		count++;
+
+#ifdef DEBUG
 		cout << "EConstructor:\t" << this << endl;
+#endif // DEBUG
+
 	}
 	~Element()
 	{
 		count--;
+#ifdef DEBUG
 		cout << "EDestructor:\t" << this << endl;
+#endif // DEBUG
+
 	}
 	friend class ForwardList;
+	friend class Iterator;
 };
 
 int Element::count = 0;
+
+class Iterator
+{
+	Element* Temp;
+public:
+	Iterator(Element* Temp = nullptr)
+	{
+		this->Temp = Temp;
+#ifdef DEBUG
+		cout << "ItConstructor:\t" << this << endl;
+#endif // DEBUG
+
+	}
+	~Iterator()
+	{
+#ifdef DEBUG
+		cout << "ItDestructor:\t" << this << endl;
+#endif // DEBUG
+
+	}
+
+	Iterator operator++(int)
+	{
+		Iterator old = *this;
+		Temp = Temp->pNext;
+		return old;
+	}
+	Iterator& operator++()
+	{
+		Temp = Temp->pNext;
+		return *this;
+	}
+	int& operator*()
+	{
+		return Temp->Data;
+	}
+	bool operator!=(const Iterator& other)const
+	{
+		return this->Temp != other.Temp;
+	}
+	bool operator!=(Element* other_el)const
+	{
+		return this->Temp != other_el;
+	}
+
+	operator bool()const
+	{
+		return Temp;
+	}
+};
+
 
 class ForwardList
 {
 	Element* Head;
 	int size;
 public:
+
+	Iterator begin()
+	{
+		return Head;
+	}
+	Iterator end()
+	{
+		return nullptr;
+	}
+
+	int get_size()const
+	{
+		return this->size;
+	}
 	ForwardList()
 	{
 		this->Head = nullptr;
@@ -49,6 +121,13 @@ public:
 	{
 		while (size--)push_front(0);
 	}
+	ForwardList(const std::initializer_list<int>& il)
+	{
+		for (const int* it = il.begin(); it != il.end(); it++)
+		{
+			push_back(*it);
+		}
+	}
 	~ForwardList()
 	{
 		while (Head != nullptr)pop_front();
@@ -58,10 +137,12 @@ public:
 	//Operators
 	int& operator[](int index)
 	{
+		if (index >= this->size)throw std::exception("Error: Out of range");
 		Element* Temp = Head;
 		for (int i = 0; i < index; i++)Temp = Temp->pNext;
 		return Temp->Data;
 	}
+
 	//			Добавление элементов
 	void push_front(int Data)
 	{
@@ -107,7 +188,20 @@ public:
 		Temp->pNext = New;
 		size++;
 	}
-	//			Удавление элементов:
+	void erase(int index)
+	{
+		if (index > size)return;
+		if (index == 0)return;
+		Element* Temp = Head;
+		Element* Temp2 = Head;
+		for (int i = 0; i < index - 2; i++)
+			Temp = Temp->pNext;
+		for (int i = 0; i < index - 1; i++)
+			Temp2 = Temp2->pNext;
+		Temp->pNext = Temp2->pNext;
+		size--;
+	}
+	//			Удаление элементов:
 	void pop_front()
 	{
 		Element* to_del = Head;	//1) запоминаем адрес удаляемого элемента
@@ -139,9 +233,12 @@ public:
 			Temp = Temp->pNext;//Переход на следующий элемент.
 		}
 #endif // OLD_STYLE
-		for (Element* Temp = Head; Temp; Temp = Temp->pNext)
+		//Temp = Temp->pNext
+		//for (Iterator Temp = Head; Temp != nullptr; ++Temp)
+		for (Iterator Temp = begin(); Temp != end(); Temp++)
 		{
-			cout << Temp << tab << Temp->Data << tab << Temp->pNext << endl;
+			//cout << Temp << tab << Temp->Data << tab << Temp->pNext << endl;
+			cout << *Temp << endl;
 		}
 		cout << "List size: " << size << endl;
 	}
@@ -150,11 +247,14 @@ public:
 #define delimiter "\n----------------------------------\n"
 
 //#define BASE_CHECK
+#define PREFORMANCE_CHECK
+//#define ITERATORS_CHECK
 
 void main()
 {
 	int n;
 	cout << "Input list size: "; cin >> n;
+
 #ifdef BASE_CHECK
 	ForwardList list;
 	for (int i = 0; i < n; i++)
@@ -177,31 +277,49 @@ void main()
 	list.print();*/
 #endif // BASE_CHECK
 
-	/*ForwardList list1;
-	list1.push_back(3);
-	list1.push_back(5);
-	list1.push_back(8);
-	list1.push_back(13);
-	list1.print();
-	cout << delimiter;
-
-	ForwardList list2;
-	list2.push_back(21);
-	list2.push_back(34);
-	list2.push_back(55);
-	list2.print();
-	cout << delimiter;
-	list1.print();*/
-
+#ifdef PREFORMANCE_CHECK
 	ForwardList list(n);
 
-	for (int i = 0; i < n; i++)
+	
+		/*for (int i = 0; i < list.get_size(); i++)
+		{
+			list[i] = rand() % 100;
+		}*/
+	for (Iterator it = list.begin(); it != list.end(); ++it)
 	{
-		list[i] = rand() % 100;
+		*it = rand() % 100;
 	}
-	for (int i = 0; i < n*2; i++)
+		cout << "List loaded" << endl;
+		//for (int i = 0; i < list.get_size(); i++)
+		//{
+		//	//cout << list[i] << '\t';
+		//	list[i];
+		//}
+		for (int i : list)
+		{
+			i;
+		}
+		cout << endl;
+		cout << "List printed" << endl;
+	
+#endif // PREFORMANCE_CHECK
+
+#ifdef ITERATOERS_CHECK
+	int arr[] = { 3, 5, 8, 13, 21 };
+	for (int i : arr)
 	{
-		cout << list[i] << '\t';
+		cout << i << endl;
+	}
+
+
+
+	ForwardList list = { 3, 4, 6, 71, 65 };
+	list.print();
+	for (int i : list)
+	{
+		cout << i << endl;
 	}
 	cout << endl;
+#endif // ITERATOERS_CHECK
+
 }
