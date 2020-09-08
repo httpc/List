@@ -202,7 +202,6 @@ public:
 		delete to_del;	//3) удаляем элемент из памяти
 		size--;
 	}
-
 	void pop_back()
 	{
 		Element* Temp = Head;
